@@ -26,15 +26,26 @@ const TelaListarProdutos: React.FC = () => {
     const voltar = () => { navegacao.goBack(); }
 
     const busca_produtos = async () => {
-        try {
-            const lista_produtos = await AsyncStorage.getItem('produtos');
-            if (lista_produtos) {
-                setProdutos(JSON.parse(lista_produtos));
+    //     try {
+    //         const lista_produtos = await AsyncStorage.getItem('produtos');
+    //         if (lista_produtos) {
+    //             setProdutos(JSON.parse(lista_produtos));
+    //         }
+    //     } catch (error) {
+    //         console.log("Erro ao buscar lista", error);
+    //     }
+        try{
+            const resposta = await fetch('http://191.252.103.125/api/produtos')
+            if(!resposta.ok){
+                throw new Error("Erro ao buscar produtos da API");
             }
-        } catch (error) {
-            console.log("Erro ao buscar lista", error);
+
+
         }
-    };
+        catch(error){
+            console.log("Erro", error);
+        }
+     };
 
     useEffect(() => {
         busca_produtos();
@@ -48,19 +59,35 @@ const TelaListarProdutos: React.FC = () => {
     const salvarEdicao = async () => {
         if (!produtoSelecionado) return;
 
-        try {
-            const listaAtual = await AsyncStorage.getItem('produtos');
-            let produtos = listaAtual ? JSON.parse(listaAtual) : [];
+        // try {
+        //     const listaAtual = await AsyncStorage.getItem('produtos');
+        //     let produtos = listaAtual ? JSON.parse(listaAtual) : [];
 
-            const atualizados = produtos.map((p: Produto) =>
-                p.id === produtoSelecionado.id ? produtoSelecionado : p
+        //     const atualizados = produtos.map((p: Produto) =>
+        //         p.id === produtoSelecionado.id ? produtoSelecionado : p
+        //     );
+
+        //     await AsyncStorage.setItem('produtos', JSON.stringify(atualizados));
+        //     setProdutos(atualizados);
+        //     setModalVisible(false);
+        // } catch (error) {
+        //     console.log("Erro ao salvar edição:", error);
+        // }
+        try{
+            const resposta = await fetch(
+                `http://191.252.103.125/api/produtos/${produtoSelecionado.id}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-type' : 'application/json'
+                    },
+                    body: JSON.stringify(produtoSelecionado)
+                },
+               
+                
             );
+        }catch(error){
 
-            await AsyncStorage.setItem('produtos', JSON.stringify(atualizados));
-            setProdutos(atualizados);
-            setModalVisible(false);
-        } catch (error) {
-            console.log("Erro ao salvar edição:", error);
         }
     };
 
